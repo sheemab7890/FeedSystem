@@ -40,6 +40,8 @@ dependencies {
 	implementation("org.modelmapper:modelmapper:3.2.0")
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 tasks.named('test') {
