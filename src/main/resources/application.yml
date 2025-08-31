@@ -1,19 +1,14 @@
 spring:
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
-  config:
-    activate:
-      on-profile: dev
   data:
     mongodb:
       host: localhost
-      port: ${DB_PORT}
-      database: ${DB_NAME}
+      port: 27017
+      database: FeedSystem
       auto-index-creation: true
 
     redis:
       host: localhost
-      port: ${REDIS_PORT}
+      port: 6379
 
 
 
