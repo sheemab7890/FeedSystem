@@ -48,7 +48,4 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// ⚡ Specify main class explicitly to fix Docker build error
-springBoot {
-	mainClass = 'com.s.s.Feed.System.FeedSystemApplication'
-}
+
