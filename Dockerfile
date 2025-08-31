@@ -54,34 +54,34 @@ FROM openjdk:21-jdk-slim AS build
 
 WORKDIR /app
 
-# Copy Gradle wrapper and build files first (for caching)
+# Copy Gradle wrapper and build files first (caching)
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
+# Make gradlew executable
 RUN chmod +x gradlew
+
+# Download dependencies (cached if build.gradle doesn’t change)
 RUN ./gradlew dependencies || true
 
 # Copy source code
 COPY src src
 
-# Build project (skip tests)
-RUN ./gradlew build -x test
+# Build project and skip tests
+RUN ./gradlew bootJar -x test
 
 # ---- Stage 2: Runtime ----
 FROM openjdk:21-jdk-slim
 
 WORKDIR /app
 
-# Copy built JAR
+# Copy only the built JAR from build stage
 COPY --from=build /app/build/libs/*.jar app.jar
 
-# Expose port
+# Expose port 8080
 EXPOSE 8081
 
 # Run the app
 CMD ["java", "-jar", "app.jar"]
-
-
-
