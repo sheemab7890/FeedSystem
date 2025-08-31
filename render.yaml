@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: feed-system
+    runtime: java
+    plan: free
+    buildCommand: "./gradlew clean build -x test"
+    startCommand: "java -jar build/libs/app.jar"
+    envVars:
+      - key: JAVA_VERSION
+        value: 21
+
