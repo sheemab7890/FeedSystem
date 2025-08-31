@@ -50,30 +50,21 @@
 #CMD ["java", "-jar", "app.jar"]
 
 # ---- Stage 1: Build ----
-FROM gradle:8.3.1-jdk17 AS builder
+FROM gradle:8.3-jdk17 AS builder
 WORKDIR /app
 
-# Copy everything needed for Gradle
 COPY build.gradle settings.gradle gradlew ./
 COPY gradle gradle
 COPY src src
 
-# Make gradlew executable
 RUN chmod +x gradlew
-
-# Build the project
 RUN ./gradlew bootJar -x test
 
 # ---- Stage 2: Runtime ----
 FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
-# Copy built jar from builder
 COPY --from=builder /app/build/libs/feedsystem-app.jar app.jar
-
-# Expose port
 EXPOSE 8080
 
-# Run the app
 ENTRYPOINT ["java","-jar","app.jar"]
-
