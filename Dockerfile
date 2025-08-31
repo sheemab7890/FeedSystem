@@ -26,62 +26,54 @@
 ## Run the Spring Boot JAR
 #CMD ["java", "-jar", "build/libs/app.jar"]
 
-#---- Stage 1: Build ----
-FROM openjdk:21-jdk-slim AS build
-
-WORKDIR /app
-
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
-
-RUN chmod +x gradlew
-RUN ./gradlew dependencies || true
-
-COPY src src
-RUN ./gradlew build -x test
-
-# ---- Stage 2: Runtime ----
-FROM openjdk:21-jdk-slim
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
-#
-## ---- Stage 1: Build ----
+##---- Stage 1: Build ----
 #FROM openjdk:21-jdk-slim AS build
 #
 #WORKDIR /app
 #
-## Copy Gradle wrapper and build files first (caching)
 #COPY gradlew .
 #COPY gradle gradle
 #COPY build.gradle .
 #COPY settings.gradle .
 #
-## Make gradlew executable
 #RUN chmod +x gradlew
-#
-## Download dependencies (cached if build.gradle doesn’t change)
 #RUN ./gradlew dependencies || true
 #
-## Copy source code
 #COPY src src
-#
-## Build project and skip tests
-#RUN ./gradlew bootJar -x test
+#RUN ./gradlew build -x test
 #
 ## ---- Stage 2: Runtime ----
 #FROM openjdk:21-jdk-slim
-#
 #WORKDIR /app
-#
-## Copy only the built JAR from build stage
 #COPY --from=build /app/build/libs/*.jar app.jar
-#
-## Expose port 8080
-#EXPOSE 8081
-#
-## Run the app
+#EXPOSE 8080
 #CMD ["java", "-jar", "app.jar"]
+
+# ---- Stage 1: Build ----
+FROM gradle:8.3.1-jdk17 AS builder
+WORKDIR /app
+
+# Copy everything needed for Gradle
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle gradle
+COPY src src
+
+# Make gradlew executable
+RUN chmod +x gradlew
+
+# Build the project
+RUN ./gradlew bootJar -x test
+
+# ---- Stage 2: Runtime ----
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+
+# Copy built jar from builder
+COPY --from=builder /app/build/libs/feedsystem-app.jar app.jar
+
+# Expose port
+EXPOSE 8080
+
+# Run the app
+ENTRYPOINT ["java","-jar","app.jar"]
+

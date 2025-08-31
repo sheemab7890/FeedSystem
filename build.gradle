@@ -48,4 +48,13 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+bootJar {
+	manifest {
+		attributes(
+				'Start-Class': 'com.sheemab.socialmedia.Feed.System.FeedSystemApplication'
+		)
+	}
+}
+
+
 
